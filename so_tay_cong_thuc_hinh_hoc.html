@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#2457d6">
+<title>Sổ tay công thức hình học 8–9</title>
+<style>
+:root{--bg:#f3f6fc;--card:#fff;--ink:#17233b;--muted:#63718a;--blue:#2457d6;--line:#dce5f5;--soft:#edf3ff;--shadow:0 5px 18px #19345c12}
+[data-theme="dark"]{--bg:#101827;--card:#182438;--ink:#edf3ff;--muted:#a9b7ce;--blue:#8eafff;--line:#30415d;--soft:#233653;--shadow:0 5px 18px #0003}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.55 system-ui,-apple-system,Segoe UI,Arial,sans-serif}
+header{background:linear-gradient(120deg,#173b91,#326de9);color:#fff;padding:26px 16px 22px;text-align:center}
+header h1{margin:0;font-size:clamp(23px,5vw,34px)}header p{margin:6px 0 0;color:#e4edff}
+main{max-width:1050px;margin:auto;padding:16px}
+.toolbar{display:flex;gap:9px;flex-wrap:wrap;margin:0 0 16px}
+input{flex:1;min-width:190px;padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:var(--card);color:var(--ink);font:inherit}
+button{border:0;border-radius:10px;padding:10px 13px;background:var(--blue);color:white;font-weight:650;cursor:pointer}
+button.secondary{background:var(--soft);color:var(--ink);border:1px solid var(--line)}
+button:focus-visible,input:focus-visible{outline:3px solid #82a8ff;outline-offset:2px}
+.section{background:var(--card);border:1px solid var(--line);border-radius:16px;margin:14px 0;overflow:hidden;box-shadow:var(--shadow)}
+.section h2{font-size:18px;margin:0;padding:12px 16px;background:var(--soft);color:var(--blue)}
+.content{display:grid;grid-template-columns:minmax(210px, .85fr) minmax(0,1.5fr);gap:18px;padding:16px;align-items:center}
+.diagram{background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:8px;min-width:0}
+svg{width:100%;height:auto;display:block;max-height:260px}
+svg .edge{stroke:#2457d6;stroke-width:3;fill:none;stroke-linecap:round;stroke-linejoin:round}
+svg .dash{stroke-dasharray:6 5}
+svg .aux{stroke:#e18a25;stroke-width:2.5;fill:none}
+svg .fill{fill:#dce9ff;stroke:#2457d6;stroke-width:3}
+svg .pt{fill:#2457d6}
+svg text{font: bold 15px system-ui,Arial;fill:var(--ink)}
+.formulas{min-width:0}
+.item{padding:9px 0;border-bottom:1px solid var(--line)}
+.item:last-child{border:0}.name{font-size:13px;color:var(--muted);margin-bottom:3px}
+.math{font-family:Georgia,"Times New Roman",serif;font-size:clamp(17px,2.5vw,21px);overflow-x:auto;white-space:nowrap}
+.note{font-size:13px;color:var(--muted);margin-top:9px}
+.copy{float:right;font-size:12px;padding:5px 9px}
+footer{text-align:center;color:var(--muted);padding:22px 10px}
+#status{text-align:center;color:var(--muted);font-size:13px}
+@media(max-width:650px){.content{grid-template-columns:1fr}.diagram{max-width:420px;margin:auto;width:100%}header{padding:22px 12px}}
+@media print{body{background:#fff;color:#111}header{background:#fff;color:#111;border-bottom:2px solid #2457d6}header p{color:#333}.toolbar,.copy,footer{display:none!important}.section{break-inside:avoid;box-shadow:none;border:1px solid #bbb}.section h2{background:#eef3ff;color:#123}.content{grid-template-columns:35% 1fr;padding:10px}.diagram{background:#fff}}
+</style>
+</head>
+<body>
+<header>
+<h1>📐 Sổ tay công thức hình học</h1>
+<p>Tổng hợp công thức trọng tâm lớp 8–9 · Có hình minh họa SVG</p>
+</header>
+<main>
+<div class="toolbar">
+<input id="search" type="search" placeholder="🔎 Tìm công thức: đường cao, tiếp tuyến, diện tích..." aria-label="Tìm công thức">
+<button class="secondary" id="themeBtn">🌙 Giao diện tối</button>
+<button id="printBtn">In / Lưu PDF</button>
+<button class="secondary" id="allBtn">Xóa tìm kiếm</button>
+</div>
+<div id="sections"></div>
+<div id="status" aria-live="polite"></div>
+</main>
+<footer>Hình vẽ được nhúng trực tiếp bằng SVG · Có thể sử dụng offline · Kiểm tra điều kiện trước khi áp dụng công thức</footer>
+<script>
+const diagrams={
+right:`<svg viewBox="0 0 320 230" role="img" aria-label="Tam giác ABC vuông tại A, AH vuông góc BC">
+<path class="fill" d="M48 184 L105 28 L278 184 Z"/><path class="edge dash" d="M105 28 L105 184"/>
+<path class="edge" d="M105 170 L119 175 L114 184"/><circle class="pt" cx="48" cy="184" r="3.5"/><circle class="pt" cx="105" cy="184" r="3.5"/><circle class="pt" cx="278" cy="184" r="3.5"/><circle class="pt" cx="105" cy="28" r="3.5"/>
+<text x="91" y="20">A</text><text x="28" y="202">B</text><text x="99" y="205">H</text><text x="281" y="202">C</text>
+</svg>`,
+similar:`<svg viewBox="0 0 320 230" role="img" aria-label="Hai tam giác đồng dạng ABC và DEF">
+<path class="fill" d="M25 185 L85 35 L160 185 Z"/><path class="fill" d="M205 185 L235 105 L295 185 Z"/>
+<text x="77" y="25">A</text><text x="12" y="204">B</text><text x="161" y="204">C</text><text x="228" y="95">D</text><text x="190" y="204">E</text><text x="298" y="204">F</text>
+<text x="168" y="112" style="font-size:23px">∼</text>
+</svg>`,
+chords:`<svg viewBox="0 0 320 230" role="img" aria-label="Hai dây cung AB và CD cắt nhau tại M trong đường tròn">
+<circle class="edge" cx="150" cy="115" r="92"/><path class="edge" d="M85 55 L220 177 M78 174 L225 55"/>
+<circle class="pt" cx="150" cy="115" r="4"/><text x="66" y="49">A</text><text x="226" y="190">B</text><text x="232" y="49">C</text><text x="61" y="190">D</text><text x="158" y="111">M</text>
+</svg>`,
+circle:`<svg viewBox="0 0 320 230" role="img" aria-label="Đường tròn tâm O với góc nội tiếp ACB">
+<circle class="edge" cx="155" cy="115" r="92"/><path class="edge" d="M155 23 L65 153 L155 207 Z"/><path class="aux" d="M155 115 L155 23 M155 115 L65 153"/>
+<circle class="pt" cx="155" cy="115" r="3.5"/><text x="147" y="15">A</text><text x="45" y="168">C</text><text x="160" y="220">B</text><text x="164" y="112">O</text>
+</svg>`,
+triangle:`<svg viewBox="0 0 320 230" role="img" aria-label="Tam giác ABC với đường phân giác AD">
+<path class="fill" d="M155 25 L35 190 L285 190 Z"/><path class="aux" d="M155 25 L160 190"/><text x="149" y="18">A</text><text x="18" y="207">B</text><text x="287" y="207">C</text><text x="157" y="210">D</text>
+</svg>`,
+trig:`<svg viewBox="0 0 320 230" role="img" aria-label="Tam giác vuông ABC với góc alpha tại C">
+<path class="fill" d="M65 25 L65 190 L270 190 Z"/><path class="edge" d="M65 170 L85 170 L85 190"/><path class="aux" d="M225 190 A45 45 0 0 0 230 163"/><text x="48" y="20">A</text><text x="43" y="207">B</text><text x="276" y="207">C</text><text x="219" y="178">α</text>
+</svg>`,
+quad:`<svg viewBox="0 0 320 230" role="img" aria-label="Hình bình hành ABCD">
+<path class="fill" d="M75 45 L270 45 L225 185 L30 185 Z"/><text x="60" y="38">A</text><text x="275" y="38">B</text><text x="228" y="205">C</text><text x="12" y="205">D</text>
+</svg>`,
+solid:`<svg viewBox="0 0 320 230" role="img" aria-label="Hình hộp chữ nhật ba chiều">
+<path class="fill" d="M55 75 L205 75 L205 195 L55 195 Z"/><path class="edge" d="M55 75 L115 30 L265 30 L205 75 M205 75 L265 30 L265 150 L205 195 M55 195 L115 150 L265 150 M115 30 L115 150" /><path class="edge dash" d="M55 75 L115 30 M115 150 L115 30 M115 150 L265 150"/>
+</svg>`
+};
+const data=[
+{title:"1. Tam giác vuông – Hệ thức lượng",diagram:"right",note:"Cho tam giác ABC vuông tại A, AH là đường cao và H thuộc BC.",items:[
+["Định lý Pythagore","BC² = AB² + AC²"],
+["Bình phương cạnh góc vuông","AB² = BH · BC"],
+["Bình phương cạnh góc vuông","AC² = CH · BC"],
+["Hệ thức đường cao","AH² = BH · CH"],
+["Tích hai cạnh góc vuông","AB · AC = AH · BC"],
+["Tính đường cao","AH = (AB · AC) / BC"],
+["Hệ thức nghịch đảo","1/AH² = 1/AB² + 1/AC²"],
+["Tỉ số đoạn chiếu","BH/CH = AB²/AC²"],
+["Tỉ số các cạnh","AB/AC = BH/AH = AH/CH"]
+]},
+{title:"2. Tam giác đồng dạng – Định lý Thales",diagram:"similar",note:"Các cạnh tương ứng phải được viết đúng thứ tự.",items:[
+["Tỉ số đồng dạng","AB/DE = AC/DF = BC/EF = k"],
+["Tỉ số diện tích","S₁/S₂ = k²"],
+["Tỉ số chu vi","P₁/P₂ = k"],
+["Thales (MN ∥ BC)","AM/AB = AN/AC = MN/BC"],
+["Thales dạng đoạn thẳng","AM/MB = AN/NC"]
+]},
+{title:"3. Hệ thức tích trong đường tròn",diagram:"chords",note:"Các điểm nằm trên cùng đường tròn; M là giao điểm hoặc điểm ngoài tùy định lý.",items:[
+["Hai dây cung AB và CD cắt nhau tại M","MA · MB = MC · MD"],
+["Hai cát tuyến từ M","MA · MB = MC · MD"],
+["Tiếp tuyến MT và cát tuyến MAB","MT² = MA · MB"],
+["Hai tiếp tuyến MA, MB từ một điểm","MA = MB"]
+]},
+{title:"4. Đường tròn – Góc và độ dài",diagram:"circle",note:"O là tâm đường tròn; R là bán kính; n là số đo góc ở tâm (độ).",items:[
+["Góc ở tâm và góc nội tiếp cùng chắn cung","∠AOB = 2∠ACB"],
+["Góc nội tiếp","∠ACB = ½∠AOB"],
+["Tứ giác ABCD nội tiếp","∠A + ∠C = 180°"],
+["Góc nội tiếp chắn nửa đường tròn","∠ACB = 90°"],
+["Chu vi đường tròn","C = 2πR"],
+["Diện tích hình tròn","S = πR²"],
+["Độ dài cung n độ","l = nπR / 180"],
+["Diện tích quạt tròn n độ","S = nπR² / 360"]
+]},
+{title:"5. Tam giác – Công thức tổng quát",diagram:"triangle",note:"a, b, c là độ dài các cạnh; p là nửa chu vi; h là đường cao tương ứng.",items:[
+["Diện tích tam giác","S = ½ · a · h"],
+["Diện tích theo hai cạnh và góc xen giữa","S = ½ · a · b · sin C"],
+["Công thức Heron","S = √[p(p−a)(p−b)(p−c)]"],
+["Nửa chu vi","p = (a+b+c)/2"],
+["Đường phân giác AD","BD/DC = AB/AC"],
+["Định lý Apollonius (M là trung điểm BC)","AB² + AC² = 2(AM² + BM²)"],
+["Tổng ba góc trong tam giác","A + B + C = 180°"]
+]},
+{title:"6. Tỉ số lượng giác trong tam giác vuông",diagram:"trig",note:"Với góc nhọn α: cạnh đối, cạnh kề được xác định theo góc α.",items:[
+["Sin","sin α = cạnh đối / cạnh huyền"],
+["Cos","cos α = cạnh kề / cạnh huyền"],
+["Tan","tan α = cạnh đối / cạnh kề"],
+["Cot","cot α = cạnh kề / cạnh đối"],
+["Hệ thức cơ bản","sin²α + cos²α = 1"],
+["Liên hệ tan và sin, cos","tan α = sin α / cos α"],
+["Hai góc phụ nhau","sin α = cos(90° − α)"]
+]},
+{title:"7. Tứ giác – Đa giác",diagram:"quad",note:"Các công thức diện tích dùng độ dài cạnh và chiều cao tương ứng.",items:[
+["Tổng góc tứ giác","360°"],
+["Hình chữ nhật","S = a · b"],
+["Hình vuông","S = a²"],
+["Hình bình hành","S = a · h"],
+["Hình thang","S = (a+b) · h / 2"],
+["Hình thoi","S = d₁ · d₂ / 2"],
+["Tổng góc trong đa giác n cạnh","(n−2) · 180°"],
+["Số đường chéo đa giác n cạnh","n(n−3)/2"]
+]},
+{title:"8. Hình không gian",diagram:"solid",note:"Sđáy là diện tích đáy; h là chiều cao; l là đường sinh hình nón.",items:[
+["Hình hộp chữ nhật","V = a · b · c"],
+["Diện tích xung quanh hộp chữ nhật","Sxq = 2h(a+b)"],
+["Hình lập phương","V = a³"],
+["Diện tích toàn phần lập phương","Stp = 6a²"],
+["Lăng trụ đứng","V = Sđáy · h"],
+["Hình trụ","V = πR²h"],
+["Diện tích xung quanh hình trụ","Sxq = 2πRh"],
+["Hình nón","V = ⅓πR²h"],
+["Diện tích xung quanh hình nón","Sxq = πRl"],
+["Hình cầu","V = ⁴⁄₃πR³"],
+["Diện tích mặt cầu","S = 4πR²"]
+]}
+];
+const root=document.getElementById("sections"),search=document.getElementById("search"),status=document.getElementById("status");
+function esc(s){return s.replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+function render(){
+ const q=search.value.trim().toLocaleLowerCase("vi");
+ let total=0;
+ root.innerHTML=data.map((section,idx)=>{
+  const items=section.items.filter(([n,f])=>(section.title+" "+section.note+" "+n+" "+f).toLocaleLowerCase("vi").includes(q));
+  if(!items.length)return "";
+  total+=items.length;
+  return `<section class="section"><h2>${esc(section.title)}</h2><div class="content">
+   <div class="diagram">${diagrams[section.diagram]}</div>
+   <div class="formulas">${items.map(([name,formula])=>`<div class="item"><button class="copy secondary" data-copy="${esc(formula)}">Copy</button><div class="name">${esc(name)}</div><div class="math">${esc(formula)}</div></div>`).join("")}
+   <div class="note">${esc(section.note)}</div></div></div></section>`;
+ }).join("");
+ status.textContent=total?`Đang hiển thị ${total} công thức trong ${root.querySelectorAll(".section").length} chủ đề.`:"Không tìm thấy công thức phù hợp.";
+}
+search.addEventListener("input",render);
+root.addEventListener("click",async e=>{
+ const b=e.target.closest("[data-copy]");if(!b)return;
+ const text=b.dataset.copy;
+ try{await navigator.clipboard.writeText(text);b.textContent="Đã copy";setTimeout(()=>b.textContent="Copy",1200)}
+ catch{const t=document.createElement("textarea");t.value=text;document.body.append(t);t.select();document.execCommand("copy");t.remove();b.textContent="Đã copy";setTimeout(()=>b.textContent="Copy",1200)}
+});
+document.getElementById("themeBtn").addEventListener("click",()=>{
+ const dark=document.documentElement.dataset.theme!=="dark";
+ document.documentElement.dataset.theme=dark?"dark":"light";
+ document.getElementById("themeBtn").textContent=dark?"☀ Giao diện sáng":"🌙 Giao diện tối";
+});
+document.getElementById("printBtn").addEventListener("click",()=>window.print());
+document.getElementById("allBtn").addEventListener("click",()=>{search.value="";render();search.focus()});
+render();
+</script>
+</body>
+</html>
